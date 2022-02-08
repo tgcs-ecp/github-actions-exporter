@@ -53,7 +53,11 @@ func getWorkflowRunsFromGithub() {
 	for {
 		for _, repo := range config.Github.Repositories.Value() {
 			r := strings.Split(repo, "/")
-			resp, _, err := client.Actions.ListRepositoryWorkflowRuns(context.Background(), r[0], r[1], nil)
+			opt := &github.ListWorkflowRunsOptions{
+				ListOptions: github.ListOptions{PerPage: 30},
+			}
+
+			resp, _, err := client.Actions.ListRepositoryWorkflowRuns(context.Background(), r[0], r[1], opt)
 			if err != nil {
 				log.Printf("ListRepositoryWorkflowRuns error for %s: %s", repo, err.Error())
 			} else {

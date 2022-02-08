@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/go-github/v38/github"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -26,7 +27,8 @@ func getRunnersFromGithub() {
 	for {
 		for _, repo := range config.Github.Repositories.Value() {
 			r := strings.Split(repo, "/")
-			resp, _, err := client.Actions.ListRunners(context.Background(), r[0], r[1], nil)
+			opt := &github.ListOptions{PerPage: 30}
+			resp, _, err := client.Actions.ListRunners(context.Background(), r[0], r[1], opt)
 			if err != nil {
 				log.Printf("ListRunners error for %s: %s", repo, err.Error())
 			} else {
