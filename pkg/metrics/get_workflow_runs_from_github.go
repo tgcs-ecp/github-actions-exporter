@@ -29,7 +29,7 @@ func getFieldValue(repo string, run github.WorkflowRun, field string) string {
 	case "workflow_id":
 		return strconv.FormatInt(*run.WorkflowID, 10)
 	case "workflow":
-		return *workflows[repo][*run.WorkflowID].Name
+		return *run.Name
 	case "event":
 		return *run.Event
 	case "status":
