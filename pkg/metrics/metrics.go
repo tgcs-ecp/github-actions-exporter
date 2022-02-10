@@ -24,27 +24,6 @@ var (
 
 // InitMetrics - register metrics in prometheus lib and start func for monitor
 func InitMetrics() {
-	workflowRunStatusGauge = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "github_workflow_run_status",
-			Help: "Workflow run status",
-		},
-		strings.Split(config.WorkflowFields, ","),
-	)
-	workflowRunDurationGauge = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "github_workflow_run_duration_ms",
-			Help: "Workflow run duration (in milliseconds)",
-		},
-		strings.Split(config.WorkflowFields, ","),
-	)
-	prometheus.MustRegister(runnersGauge)
-	prometheus.MustRegister(runnersOrganizationGauge)
-	prometheus.MustRegister(workflowRunStatusGauge)
-	prometheus.MustRegister(workflowRunDurationGauge)
-	prometheus.MustRegister(workflowBillGauge)
-	prometheus.MustRegister(runnersEnterpriseGauge)
-
 	client, err = NewClient()
 	if err != nil {
 		log.Fatalln("Error: Client creation failed." + err.Error())
@@ -58,11 +37,43 @@ func InitMetrics() {
 		}
 	}
 
-	go getBillableFromGithub()
-	go getRunnersFromGithub()
-	go getRunnersOrganizationFromGithub()
-	go getWorkflowRunsFromGithub()
-	go getRunnersEnterpriseFromGithub()
+	log.Print("Metrics to export:" + config.MetricsToExport)
+	metricsToExport := strings.Split(config.MetricsToExport, ",")
+
+	if contains(metricsToExport, "runners") {
+		prometheus.MustRegister(runnersGauge)
+		prometheus.MustRegister(runnersOrganizationGauge)
+		prometheus.MustRegister(runnersEnterpriseGauge)
+		go getRunnersFromGithub()
+		go getRunnersOrganizationFromGithub()
+		go getRunnersEnterpriseFromGithub()
+	}
+
+	if contains(metricsToExport, "billable_time") {
+		prometheus.MustRegister(workflowBillGauge)
+		go getBillableFromGithub()
+	}
+
+	if contains(metricsToExport, "workflow_runs") {
+		workflowRunStatusGauge = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "github_workflow_run_status",
+				Help: "Workflow run status",
+			},
+			strings.Split(config.WorkflowFields, ","),
+		)
+		workflowRunDurationGauge = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "github_workflow_run_duration_ms",
+				Help: "Workflow run duration (in milliseconds)",
+			},
+			strings.Split(config.WorkflowFields, ","),
+		)
+		prometheus.MustRegister(workflowRunStatusGauge)
+		prometheus.MustRegister(workflowRunDurationGauge)
+		go getWorkflowRunsFromGithub()
+	}
+
 }
 
 // NewClient creates a Github Client
@@ -121,4 +132,13 @@ func getEnterpriseApiUrl(baseURL string) (string, error) {
 
 	// Trim trailing slash, otherwise there's double slash added to token endpoint
 	return fmt.Sprintf("%s://%s%s", baseEndpoint.Scheme, baseEndpoint.Host, strings.TrimSuffix(baseEndpoint.Path, "/")), nil
+}
+
+func contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }

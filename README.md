@@ -30,6 +30,7 @@ Authentication can either via a Github Token or the Github App Authentication 3 
 | Github Api URL | github_api_url, url | GITHUB_API_URL | api.github.com | Github API URL (primarily for Github Enterprise usage) |
 | Github Enterprise Name | enterprise_name | ENTERPRISE_NAME | "" | Enterprise name. Needed for enterprise endpoints (/enterprises/{ENTERPRISE_NAME}/*). Currently used to get Enterprise level tunners status |
 | Fields to export | export_fields | EXPORT_FIELDS | repo,id,node_id,head_branch,head_sha,run_number,workflow_id,workflow,event,status | A comma separated list of fields for workflow metrics that should be exported |
+| Metrics to export | export_metrics | EXPORT_METRICS | `workflow_runs` | A comma separated list of metrics that should be exported. Possible values: `billable_time,runners,workflow_runs` |
 
 ## Exported stats
 
