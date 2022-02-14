@@ -54,6 +54,11 @@ func InitMetrics() {
 		go getBillableFromGithub()
 	}
 
+	withUsage := false
+	if contains(metricsToExport, "workflow_runs_usage") {
+		withUsage = true
+	}
+
 	if contains(metricsToExport, "workflow_runs") {
 		workflowRunStatusGauge = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -62,16 +67,20 @@ func InitMetrics() {
 			},
 			strings.Split(config.WorkflowFields, ","),
 		)
-		workflowRunDurationGauge = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "github_workflow_run_duration_ms",
-				Help: "Workflow run duration (in milliseconds)",
-			},
-			strings.Split(config.WorkflowFields, ","),
-		)
 		prometheus.MustRegister(workflowRunStatusGauge)
-		prometheus.MustRegister(workflowRunDurationGauge)
-		go getWorkflowRunsFromGithub()
+
+		if withUsage {
+			workflowRunDurationGauge = prometheus.NewGaugeVec(
+				prometheus.GaugeOpts{
+					Name: "github_workflow_run_duration_ms",
+					Help: "Workflow run duration (in milliseconds)",
+				},
+				strings.Split(config.WorkflowFields, ","),
+			)
+			prometheus.MustRegister(workflowRunDurationGauge)
+		}
+
+		go getWorkflowRunsFromGithub(config.WorkflowBranch, withUsage)
 	}
 
 }

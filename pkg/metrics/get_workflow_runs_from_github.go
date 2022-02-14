@@ -49,12 +49,12 @@ func getRelevantFields(repo string, run *github.WorkflowRun) []string {
 }
 
 // getWorkflowRunsFromGithub - return informations and status about a workflow
-func getWorkflowRunsFromGithub() {
+func getWorkflowRunsFromGithub(workflowBranch string, withUsage bool) {
 	for {
 		for _, repo := range config.Github.Repositories.Value() {
 			r := strings.Split(repo, "/")
 			opt := &github.ListWorkflowRunsOptions{
-				ListOptions: github.ListOptions{PerPage: 30},
+				Branch: workflowBranch,
 			}
 
 			resp, _, err := client.Actions.ListRepositoryWorkflowRuns(context.Background(), r[0], r[1], opt)
@@ -77,14 +77,16 @@ func getWorkflowRunsFromGithub() {
 
 					workflowRunStatusGauge.WithLabelValues(fields...).Set(s)
 
-					resp, _, err := client.Actions.GetWorkflowRunUsageByID(context.Background(), r[0], r[1], *run.ID)
-					if err != nil { // Fallback for Github Enterprise
-						created := run.CreatedAt.Time.Unix()
-						updated := run.UpdatedAt.Time.Unix()
-						elapsed := updated - created
-						workflowRunDurationGauge.WithLabelValues(fields...).Set(float64(elapsed * 1000))
-					} else {
-						workflowRunDurationGauge.WithLabelValues(fields...).Set(float64(resp.GetRunDurationMS()))
+					if withUsage {
+						resp, _, err := client.Actions.GetWorkflowRunUsageByID(context.Background(), r[0], r[1], *run.ID)
+						if err != nil { // Fallback for Github Enterprise
+							created := run.CreatedAt.Time.Unix()
+							updated := run.UpdatedAt.Time.Unix()
+							elapsed := updated - created
+							workflowRunDurationGauge.WithLabelValues(fields...).Set(float64(elapsed * 1000))
+						} else {
+							workflowRunDurationGauge.WithLabelValues(fields...).Set(float64(resp.GetRunDurationMS()))
+						}
 					}
 				}
 			}

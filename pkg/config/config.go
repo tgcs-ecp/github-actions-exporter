@@ -19,6 +19,7 @@ var (
 	EnterpriseName  string
 	WorkflowFields  string
 	MetricsToExport string
+	WorkflowBranch  string
 )
 
 // InitConfiguration - set configuration from env vars or command parameters
@@ -113,9 +114,16 @@ func InitConfiguration() []cli.Flag {
 		&cli.StringFlag{
 			Name:        "export_metrics",
 			EnvVars:     []string{"EXPORT_METRICS"},
-			Usage:       "A comma separated list of which metrics to export. Possible values: billable_time, runners, workflow_runs",
+			Usage:       "A comma separated list of which metrics to export. Possible values: billable_time, runners, workflow_runs, workflow_runs_usage(depends on workflow_runs)",
 			Value:       "workflow_runs",
 			Destination: &MetricsToExport,
+		},
+		&cli.StringFlag{
+			Name:        "workflow_runs_branch",
+			EnvVars:     []string{"WORKFLOW_RUNS_BRANCH"},
+			Usage:       "Branch for which to export workflow run information. If unset, data for all existing branches will be exported.",
+			Value:       "",
+			Destination: &WorkflowBranch,
 		},
 	}
 }
