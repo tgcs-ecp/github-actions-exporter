@@ -1,7 +1,7 @@
 # Default values for github-actions-exporter.
 
 image:
-  repository: ghcr.io/lucian-tgcs/github-actions-exporter
+  repository: ghcr.io/tgcs-ecp/github-actions-exporter
   pullPolicy: IfNotPresent
   tag: ""
 
