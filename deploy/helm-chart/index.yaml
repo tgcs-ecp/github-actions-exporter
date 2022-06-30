@@ -3,12 +3,12 @@ entries:
   github-actions-exporter:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2022-02-08T23:37:39.5442813+02:00"
+    created: "2022-06-30T13:04:17.7307237+02:00"
     description: github-actions exporter for prometheus
-    digest: a8d5b95df3c6d2c6e80bf2867be150d4f626fc08bccb979e0934e53e9edc5637
+    digest: f2c13dfa120a22818d31a0f0dbc72cf63eb97eb82f22d7813febd76ed5537250
     name: github-actions-exporter
     type: application
     urls:
-    - https://raw.githubusercontent.com/lucian-tgcs/github-actions-exporter/develop/deploy/helm-chart/packed/github-actions-exporter-0.1.5.tgz
+    - https://raw.githubusercontent.com/tgcs-ecp/github-actions-exporter/develop/deploy/helm-chart/packed/github-actions-exporter-0.1.5.tgz
     version: 0.1.5
-generated: "2022-02-08T23:37:39.5381319+02:00"
+generated: "2022-06-30T13:04:17.7307237+02:00"
