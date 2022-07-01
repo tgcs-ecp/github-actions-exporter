@@ -42,7 +42,8 @@ serviceMonitor:
   # targetLabels: []
   # metricRelabelings: []
 
-imagePullSecrets: []
+imagePullSecrets: 
+  - name: ghcrio
 
 podAnnotations: {}
 
